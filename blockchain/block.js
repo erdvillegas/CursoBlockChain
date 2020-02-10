@@ -16,12 +16,23 @@ class Block {
         this.data = data;
     }
 
+    /**
+     * Obtiene el bloque genesis
+     */
+    static get genesis() {
+        const timestamp = (new Date(2000, 0, 1)).getTime();
+        return new this(timestamp, undefined, 'g3n3sis-h4sh', 'Hello World');
+    }
+
+    /**
+     * Despliega el objeto en formato de texto
+     */
     toString() {
         const {
             timestamp,
             previousHash,
             hash,
-            data
+            data,
         } = this;
 
         return `Block -
