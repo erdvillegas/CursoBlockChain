@@ -25,6 +25,17 @@ class Block {
     }
 
     /**
+     * Trata de minar el bloque
+     */
+    static mine(previousBlock, data) {
+        const timestamp = Date.now();
+        const hash = '@TODO-HASH';
+        const { hash: previousHash } = previousBlock;
+
+        return new this(timestamp, previousHash, hash, data);
+    }
+
+    /**
      * Despliega el objeto en formato de texto
      */
     toString() {
