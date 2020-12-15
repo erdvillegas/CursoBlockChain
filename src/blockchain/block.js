@@ -1,5 +1,7 @@
 import { SHA256 } from 'crypto-js';
 
+const DIFICULTY = 3;
+
 /**
  * Bloque de la cadena
  */
@@ -11,11 +13,12 @@ class Block {
      * @param {*} hash Hash actual
      * @param {*} data Datos a procesar
      */
-    constructor(timestamp, previousHash, hash, data) {
+    constructor(timestamp, previousHash, hash, data, nonce) {
         this.timestamp = timestamp;
         this.previousHash = previousHash;
         this.hash = hash;
         this.data = data;
+        this.nonce = nonce;
     }
 
     /**
@@ -23,18 +26,25 @@ class Block {
      */
     static get genesis() {
         const timestamp = (new Date(2000, 0, 1)).getTime();
-        return new this(timestamp, undefined, 'g3n3sis-h4sh', 'Hello World');
+        return new this(timestamp, undefined, 'g3n3sis-h4sh', 'Hello World',0);
     }
 
     /**
-     * Trata de minar el bloque
+     * Trata de minar el bloque 
      */
     static mine(previousBlock, data) {
-        const timestamp = Date.now();
         const { hash: previousHash } = previousBlock;
-        const hash = Block.hash(timestamp, previousHash, data);
+        let hash;
+        let nonce = 0;
+        let timestamp;
+        
+        do {
+            timestamp = Date.now();
+            nonce+=1;
+            hash = Block.hash(timestamp,previousHash,data,nonce);
+        } while(hash.substring(0,DIFICULTY) !== '0'.repeat(DIFICULTY));
 
-        return new this(timestamp, previousHash, hash, data);
+        return new this(timestamp, previousHash, hash, data, nonce);
     }
 
     /**
@@ -42,9 +52,10 @@ class Block {
      * @param {*} timestamp Marca de tiempo
      * @param {*} previousHash Hash previo
      * @param {*} data Datos
+     * @param {*} nonce Numero pseudoaleatorio
      */
-    static hash(timestamp, previousHash, data) {
-        return SHA256(`${timestamp}${previousHash}${data}`).toString();
+    static hash(timestamp, previousHash, data, nonce) {
+        return SHA256(`${timestamp}${previousHash}${data}${nonce}`).toString();
     }
 
     /**
@@ -56,13 +67,15 @@ class Block {
             previousHash,
             hash,
             data,
+            nonce
         } = this;
 
         return `Block -
         timestamp: ${timestamp}
         previousHash: ${previousHash}
         hash: ${hash}
-        data: ${data}`;
+        data: ${data}
+        nonce: ${nonce}`;
     }
 }
 

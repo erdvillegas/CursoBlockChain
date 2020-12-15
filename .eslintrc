@@ -4,6 +4,7 @@
         "jest": true,
         "node": true
     },
+    "esversion": 6,
     "rules": {
         "max-len":[1,120,{"tabWidth":2,"ignoreComments":true}]
     }
