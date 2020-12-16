@@ -13,12 +13,14 @@ export default (blockchain) => {
             timestamp,
             hash,
             data,
+            nonce,
+            difficulty
         } = blocks[i];
 
         const previousBlock = blockchain[i];
 
         if (previousHash !== previousBlock.hash) throw Error('Invalid previous hash');
-        if (hash !== Block.hash(timestamp, previousHash, data)) throw Error('Invalid hash');
+        if (hash !== Block.hash(timestamp, previousHash, data,nonce,difficulty)) throw Error('Invalid hash');
     }
 
     return true;

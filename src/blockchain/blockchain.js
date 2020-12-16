@@ -1,5 +1,5 @@
 import Block from './block';
-import validate from './modules/validate'
+import validate from './modules/validate';
 
 /**
  * Cadena de bloques

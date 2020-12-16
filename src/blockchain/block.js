@@ -1,6 +1,7 @@
 import { SHA256 } from 'crypto-js';
+import adjustDifficulty from '../blockchain/modules/adjustDifficulty';
 
-const DIFICULTY = 3;
+const DIFFICULTY = 3;
 
 /**
  * Bloque de la cadena
@@ -12,13 +13,16 @@ class Block {
      * @param {*} previousHash Hash previo
      * @param {*} hash Hash actual
      * @param {*} data Datos a procesar
+     * @param {*} nonce Numero pseudoaleatorio
+     * @param {*} difficulty Dificultad del algoritmo
      */
-    constructor(timestamp, previousHash, hash, data, nonce) {
+    constructor(timestamp, previousHash, hash, data, nonce, difficulty) {
         this.timestamp = timestamp;
         this.previousHash = previousHash;
         this.hash = hash;
         this.data = data;
         this.nonce = nonce;
+        this.difficulty = difficulty;
     }
 
     /**
@@ -26,7 +30,7 @@ class Block {
      */
     static get genesis() {
         const timestamp = (new Date(2000, 0, 1)).getTime();
-        return new this(timestamp, undefined, 'g3n3sis-h4sh', 'Hello World',0);
+        return new this(timestamp, undefined, 'g3n3sis-h4sh', 'Hello World',0,DIFFICULTY);
     }
 
     /**
@@ -37,14 +41,16 @@ class Block {
         let hash;
         let nonce = 0;
         let timestamp;
+        let {difficulty} = previousBlock;
         
         do {
             timestamp = Date.now();
             nonce+=1;
-            hash = Block.hash(timestamp,previousHash,data,nonce);
-        } while(hash.substring(0,DIFICULTY) !== '0'.repeat(DIFICULTY));
+            difficulty = adjustDifficulty(previousBlock,timestamp);
+            hash = Block.hash(timestamp,previousHash,data,nonce,difficulty);
+        } while(hash.substring(0,difficulty) !== '0'.repeat(difficulty));
 
-        return new this(timestamp, previousHash, hash, data, nonce);
+        return new this(timestamp, previousHash, hash, data, nonce,difficulty);
     }
 
     /**
@@ -53,9 +59,10 @@ class Block {
      * @param {*} previousHash Hash previo
      * @param {*} data Datos
      * @param {*} nonce Numero pseudoaleatorio
+     * @param {*} difficulty Dificultad del algoritmo
      */
-    static hash(timestamp, previousHash, data, nonce) {
-        return SHA256(`${timestamp}${previousHash}${data}${nonce}`).toString();
+    static hash(timestamp, previousHash, data, nonce, difficulty) {
+        return SHA256(`${timestamp}${previousHash}${data}${nonce}${difficulty}`).toString();
     }
 
     /**
@@ -67,7 +74,8 @@ class Block {
             previousHash,
             hash,
             data,
-            nonce
+            nonce,
+            difficulty
         } = this;
 
         return `Block -
@@ -75,8 +83,10 @@ class Block {
         previousHash: ${previousHash}
         hash: ${hash}
         data: ${data}
-        nonce: ${nonce}`;
+        nonce: ${nonce}
+        difficulty ${difficulty}`;
     }
 }
 
+export { DIFFICULTY };
 export default Block;
