@@ -79,12 +79,12 @@ class Block {
         } = this;
 
         return `Block -
-        timestamp: ${timestamp}
-        previousHash: ${previousHash}
-        hash: ${hash}
-        data: ${data}
-        nonce: ${nonce}
-        difficulty ${difficulty}`;
+        timestamp:      ${timestamp}
+        previousHash:   ${previousHash}
+        hash:           ${hash}
+        data:           ${data}
+        nonce:          ${nonce}
+        difficulty:     ${difficulty}`;
     }
 }
 

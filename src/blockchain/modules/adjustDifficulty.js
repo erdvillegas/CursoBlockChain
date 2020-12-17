@@ -6,5 +6,7 @@ const MINE_RATE = 3000;
 export default (previousBlock, timeStamp) => {
     const { difficulty } = previousBlock;
 
-    return previousBlock.timeStamp + MINE_RATE > timeStamp ? difficulty + 1 : difficulty -1;
+    return previousBlock.timestamp + MINE_RATE > timeStamp 
+    ? difficulty + 1 
+    : difficulty -1;
 };
