@@ -1,4 +1,5 @@
 import uuidV1 from 'uuid/v1';
+import { eliptic } from '../modules';
 
 class Transaction {
     constructor() {
@@ -18,7 +19,18 @@ class Transaction {
             { ammount, address: recipienteAddress }
         ]);
 
+        transaction.input = {
+            timestamp: Date.now(),
+            ammount: senderWallet.balance,
+            address: senderWallet.publicKey,
+            signature: senderWallet.sign(transaction.outputs)
+        };
         return transaction;
+    }
+
+    static verify(transaction) {
+        const { input: { addres, signature }, outputs } = transaction;
+        return eliptic.verifySignature(addres,signature,outputs);
     }
 }
 
