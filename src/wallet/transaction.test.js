@@ -45,14 +45,44 @@ describe('Transaction', () => {
         expect(transaction.input.address).toEqual(wallet.publicKey);
     });
 
-    it('inputs has a signature usign the wallet',()=>{
+    it('inputs has a signature usign the wallet', () => {
         expect(typeof transaction.input.signature).toEqual('object');
         expect(transaction.input.signature).toEqual(wallet.sign(transaction.outputs));
     });
 
-    it('use sign()',()=>{
+    it('use sign()', () => {
         const signature = wallet.sign('hello');
         expect(typeof signature).toEqual('object');
         expect(signature).toEqual(wallet.sign('hello'));
+    });
+
+    it('validates a valid transaction', () => {
+        expect(Transaction.verify(transaction)).toBe(true);
+    });
+
+    it('invalidates a corrupted transaction', () => {
+        transaction.outputs[0].ammount = 500;
+        expect(Transaction.verify(transaction)).toBe(false);
+    });
+
+    describe('and updating a transaction', () => {
+        let nextAmmount;
+        let nextRecipient;
+
+        beforeEach(() => {
+            nextAmmount = 3;
+            nextRecipient = 'nxT-aDdRe22';
+            transaction = transaction.update(wallet, nextRecipient, nextAmmount);
+        });
+
+        it('substract the next ammount from the sender wallet', () => {
+            const output = transaction.outputs.find(({ address }) => address === wallet.publicKey);
+            expect(output.ammount).toEqual(wallet.balance - ammount - nextAmmount);
+        });
+
+        it('outputs an ammount for the next recipient',()=>{
+            const output = transaction.outputs.find(({address}) => address === nextRecipient);
+            expect(output.ammount).toEqual(nextAmmount);
+        });
     });
 });
