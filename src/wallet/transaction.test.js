@@ -80,8 +80,8 @@ describe('Transaction', () => {
             expect(output.ammount).toEqual(wallet.balance - ammount - nextAmmount);
         });
 
-        it('outputs an ammount for the next recipient',()=>{
-            const output = transaction.outputs.find(({address}) => address === nextRecipient);
+        it('outputs an ammount for the next recipient', () => {
+            const output = transaction.outputs.find(({ address }) => address === nextRecipient);
             expect(output.ammount).toEqual(nextAmmount);
         });
     });
