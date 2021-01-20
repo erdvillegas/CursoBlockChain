@@ -1,5 +1,6 @@
 import Block from './block';
 import validate from './modules/validate';
+import  MemoryPool  from "./memoryPoll";
 
 /**
  * Cadena de bloques
@@ -7,6 +8,7 @@ import validate from './modules/validate';
 class Blockchain {
     constructor() {
         this.blocks = [Block.genesis];
+        this.memoryPool = new MemoryPool();
     }
 
     /**

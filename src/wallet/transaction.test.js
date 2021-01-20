@@ -4,41 +4,41 @@ import Wallet from './wallet';
 describe('Transaction', () => {
     let wallet;
     let transaction;
-    let ammount;
+    let amount;
     let recipentAddress;
 
     beforeEach(() => {
         wallet = new Wallet();
         recipentAddress = 'r3cip13nt';
-        ammount = 5;
-        transaction = Transaction.create(wallet, recipentAddress, ammount);
+        amount = 5;
+        transaction = Transaction.create(wallet, recipentAddress, amount);
     });
 
-    it('outputs the `ammount` substracted from the wallet', () => {
+    it('outputs the `amount` substracted from the wallet', () => {
         const output = transaction.outputs.find(({ address }) => address === wallet.publicKey);
-        expect(output.ammount).toEqual(wallet.balance - ammount);
+        expect(output.amount).toEqual(wallet.balance - amount);
     });
 
-    it('outputs the `ammount` added from the wallet', () => {
+    it('outputs the `amount` added from the wallet', () => {
         const output = transaction.outputs.find(({ address }) => address === recipentAddress);
-        expect(output.ammount).toEqual(ammount);
+        expect(output.amount).toEqual(amount);
     });
 
     describe('transacting with amount that exceeds the balance', () => {
         beforeEach(() => {
-            ammount = 500;
+            amount = 500;
             transaction = undefined;
         });
 
         it('does  not create the transaction', () => {
             expect(() => {
-                transaction = Transaction.create(wallet, recipentAddress, ammount);
-            }).toThrowError(`Ammount: ${ammount} exceeds balance.`);
+                transaction = Transaction.create(wallet, recipentAddress, amount);
+            }).toThrowError(`Amount: ${amount} exceeds balance.`);
         });
     });
 
     it('inputs the balance of the wallet', () => {
-        expect(transaction.input.ammount).toEqual(wallet.balance);
+        expect(transaction.input.amount).toEqual(wallet.balance);
     });
 
     it('inputs the sender address of the wallet', () => {
@@ -61,28 +61,28 @@ describe('Transaction', () => {
     });
 
     it('invalidates a corrupted transaction', () => {
-        transaction.outputs[0].ammount = 500;
+        transaction.outputs[0].amount = 500;
         expect(Transaction.verify(transaction)).toBe(false);
     });
 
     describe('and updating a transaction', () => {
-        let nextAmmount;
+        let nextAmount;
         let nextRecipient;
 
         beforeEach(() => {
-            nextAmmount = 3;
+            nextAmount = 3;
             nextRecipient = 'nxT-aDdRe22';
-            transaction = transaction.update(wallet, nextRecipient, nextAmmount);
+            transaction = transaction.update(wallet, nextRecipient, nextAmount);
         });
 
-        it('substract the next ammount from the sender wallet', () => {
+        it('substract the next amount from the sender wallet', () => {
             const output = transaction.outputs.find(({ address }) => address === wallet.publicKey);
-            expect(output.ammount).toEqual(wallet.balance - ammount - nextAmmount);
+            expect(output.amount).toEqual(wallet.balance - amount - nextAmount);
         });
 
-        it('outputs an ammount for the next recipient', () => {
+        it('outputs an amount for the next recipient', () => {
             const output = transaction.outputs.find(({ address }) => address === nextRecipient);
-            expect(output.ammount).toEqual(nextAmmount);
+            expect(output.amount).toEqual(nextAmount);
         });
     });
 });

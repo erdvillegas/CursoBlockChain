@@ -8,15 +8,15 @@ class Transaction {
         this.outputs = [];
     }
 
-    static create(senderWallet, recipienteAddress, ammount) {
+    static create(senderWallet, recipienteAddress, amount) {
         const { balance, publicKey } = senderWallet;
 
-        if (ammount > balance) throw Error(`Ammount: ${ammount} exceeds balance.`);
+        if (amount > balance) throw Error(`Amount: ${amount} exceeds balance.`);
 
         const transaction = new Transaction();
         transaction.outputs.push(...[
-            { ammount: balance - ammount, address: publicKey },
-            { ammount, address: recipienteAddress }
+            { amount: balance - amount, address: publicKey },
+            { amount, address: recipienteAddress }
         ]);
 
         transaction.input = Transaction.sign(transaction, senderWallet);
@@ -31,18 +31,18 @@ class Transaction {
     static sign(transaction, senderWallet) {
         return {
             timestamp: Date.now(),
-            ammount: senderWallet.balance,
+            amount: senderWallet.balance,
             address: senderWallet.publicKey,
             signature: senderWallet.sign(transaction.outputs)
         };
     }
 
-    update(senderWallet, recipentAddress, ammount) {
+    update(senderWallet, recipentAddress, amount) {
         const senderOutput = this.outputs.find((output) => output.address === senderWallet.publicKey);
 
-        if (ammount > senderOutput.ammount) throw new Error(`Ammount: ${ammount} exceeds balance`);
-        senderOutput.ammount -= ammount;
-        this.outputs.push({ ammount, address: recipentAddress });
+        if (amount > senderOutput.amount) throw new Error(`Amount: ${amount} exceeds balance`);
+        senderOutput.amount -= amount;
+        this.outputs.push({ amount, address: recipentAddress });
         this.input = Transaction.sign(this, senderWallet);
 
         return this;
