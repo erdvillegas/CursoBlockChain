@@ -30,6 +30,12 @@ class Wallet {
         return this.keyPair.sign(hash(data));
     }
 
+    /**
+     * Crea una transaccion
+     * @param {*} recipentAddress 
+     * @param {*} amount 
+     * @returns
+     */
     createTransaction(recipentAddress, amount){
         const { balance, blockchain: {memoryPool} } = this;
 

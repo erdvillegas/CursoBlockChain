@@ -3,7 +3,10 @@ import WebSocket from 'ws';
 
 const { P2P_PORT = 5000, PEERS } = process.env;
 const peers = PEERS ? PEERS.split(',') : [];
-const MESSAGE = { BLOCKS: 'blocks' };
+const MESSAGE = {
+    BLOCKS: 'blocks',
+    TX: 'transactions',
+};
 
 class P2PServices {
     constructor(blockchain) {
@@ -30,10 +33,12 @@ class P2PServices {
         socket.on('message', (message) => {
             const { type, value } = JSON.parse(message);
 
-            try{
-            if (type == MESSAGE.BLOCKS){ this.blockchain.replace(value)}
-            }catch(error){
+            try {
+                if (type == MESSAGE.BLOCKS) { this.blockchain.replace(value) }
+                else if (type == MESSAGE.TX) this.blockchain.memoryPool.addOrUpdate(value);
+            } catch (error) {
                 console.error(`[ws:Error] error ${error}`);
+                throw Error(error);
             }
 
             console.log({ type, value });
@@ -42,9 +47,9 @@ class P2PServices {
         socket.send(JSON.stringify({ type: MESSAGE.BLOCKS, value: blocks }));
     }
 
-    sync(){
-        const {blockchain: {blocks}} = this;
-        this.broadcast(MESSAGE.BLOCKS,blocks);
+    sync() {
+        const { blockchain: { blocks } } = this;
+        this.broadcast(MESSAGE.BLOCKS, blocks);
     }
 
     broadcast(type, value) {
@@ -54,4 +59,5 @@ class P2PServices {
     }
 }
 
+export { MESSAGE };
 export default P2PServices;

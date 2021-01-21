@@ -1,12 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import BlockChain, { Block } from '../blockchain';
-import P2PServices from '../services/p2p';
+import Wallet from "../wallet";
+import P2PServices, {MESSAGE} from '../services/p2p';
 
 const { HTTP_PORT = 3000 } = process.env;
 
 const app = express();
 const blockChain = new BlockChain();
+const wallet = new Wallet(blockChain);
 const p2pService = new P2PServices(blockChain);
 
 app.use(bodyParser.json());
@@ -24,6 +26,23 @@ app.post('/mine', (req, res) => {
         blocks: blockChain.blocks.length,
         block
     });
+
+});
+
+app.get('/transactions', (req, res)=>{
+    const { memoryPool: {transactions}} = blockChain;
+    res.json(transactions);
+});
+
+app.post('/transactions', (req, res)=>{
+    const { body: {recipient, amount}} = req;
+    try {
+        const tx = wallet.createTransaction(recipient, amount);
+        p2pService.broadcast(MESSAGE.TX,tx);
+        res.json(tx);
+    } catch (error) {
+        res.json({error: error.message});
+    }
 
 });
 
