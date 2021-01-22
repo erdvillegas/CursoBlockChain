@@ -24,14 +24,19 @@ describe('MemoryPool', () => {
     });
 
     it('updates a transaction in the memoryPoll', () => {
-        const txOld =  JSON.stringify(wallet,'');
-        const txNew = transaction.update(wallet,"4d105-Mu4do",10);
+        const txOld = JSON.stringify(wallet, '');
+        const txNew = transaction.update(wallet, "4d105-Mu4do", 10);
         memoryPoll.addOrUpdate(transaction);
 
         expect(memoryPoll.transactions.length).toEqual(1);
-        
-        const found = memoryPoll.transactions.find(({id}) => id === transaction.id);
+
+        const found = memoryPoll.transactions.find(({ id }) => id === transaction.id);
         expect(JSON.stringify(found)).not.toEqual(txOld);
         expect(txNew).toEqual(found);
+    });
+
+    it('wipe transactions', () => {
+        memoryPoll.wipe();
+        expect(memoryPoll.transactions.length).toEqual(0);
     });
 });

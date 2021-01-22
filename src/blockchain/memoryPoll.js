@@ -1,6 +1,5 @@
 import { Transaction } from "../wallet";
 
-
 /**
  * Memoria de la cadena
  */
@@ -23,6 +22,10 @@ class MemoryPool {
 
     find(address) {
         return this.transactions.find(({ input }) => input.address === address);
+    }
+
+    wipe() {
+        this.transactions = [];
     }
 }
 

@@ -3,13 +3,16 @@ import bodyParser from 'body-parser';
 import BlockChain, { Block } from '../blockchain';
 import Wallet from "../wallet";
 import P2PServices, {MESSAGE} from '../services/p2p';
+import Miner from '../miner/miner';
 
 const { HTTP_PORT = 3000 } = process.env;
 
 const app = express();
 const blockChain = new BlockChain();
 const wallet = new Wallet(blockChain);
+const walletMiner = new Wallet(blockChain);
 const p2pService = new P2PServices(blockChain);
+const miner = new Miner(blockChain,p2pService,walletMiner);
 
 app.use(bodyParser.json());
 
@@ -45,6 +48,16 @@ app.post('/transactions', (req, res)=>{
     }
 
 });
+
+app.get('/mine/transactions', (req, res) => {
+    try{
+        miner.mine();
+        res.redirect('/blocks');
+    }catch (error){
+        res.json({error: error.message});
+    }
+});
+
 
 app.listen(HTTP_PORT, () => {
     console.log(`Serivec HTTP:${HTTP_PORT} ...listening`);
