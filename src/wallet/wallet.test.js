@@ -45,8 +45,60 @@ describe('wallet', () => {
             });
 
             it('clones the `ammount` output for the rcipient', () => {
-                const amounts = tx.outputs.filter(({ address }) =>address === recipentAddress).map(output => output.amount);
+                const amounts = tx.outputs.filter(({ address }) => address === recipentAddress).map(output => output.amount);
                 expect(amounts).toEqual([amount, amount]);
+            });
+        });
+    });
+
+    describe('calculating the current balance', () => {
+        let addBalance;
+        let times;
+        let senderwallet;
+
+        beforeEach(() => {
+            addBalance = 16;
+            times = 3;
+            senderwallet = new Wallet(blockchain);
+
+            for (let i = 0; i < times; i+=1) {
+                senderwallet.createTransaction(wallet.publicKey, addBalance);
+            }
+
+            blockchain.addBlock(blockchain.memoryPool.transactions);
+        });
+
+        it('calculates the balance for blockchain txs matching the recipient', () => {
+            expect(wallet.currentBalance).toEqual(INITIAL_BALANCE + (addBalance * times));
+        });
+
+        it('calculate the balance for blockchain txs matching the sender', () => {
+            expect(senderwallet.currentBalance).toEqual(INITIAL_BALANCE - (addBalance * times));
+        });
+
+        describe('and the recipient conducts a transaction', () => {
+            let substractBalance;
+            let recipientBalance;
+            beforeEach(() => {
+                blockchain.memoryPool.wipe();
+                substractBalance = 64;
+                recipientBalance = wallet.currentBalance;
+                wallet.createTransaction(senderwallet.publicKey, addBalance);
+
+                blockchain.addBlock(blockchain.memoryPool.transactions);
+            });
+
+            describe('and the sender sends another transaction to the recipient', () => {
+                beforeEach(() => {
+                    blockchain.memoryPool.wipe();
+                    senderwallet.createTransaction(wallet.publicKey,addBalance);
+
+                    blockchain.addBlock(blockchain.memoryPool.transactions);
+                });
+
+                it('calculate the recipient balance only usign txs since its most recent one',()=>{
+                    expect(wallet.currentBalance).toEqual(recipientBalance-substractBalance + addBalance);
+                });
             });
         });
     });

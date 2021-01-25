@@ -35,9 +35,9 @@ class P2PServices {
             const { type, value } = JSON.parse(message);
 
             try {
-                if (type == MESSAGE.BLOCKS) { this.blockchain.replace(value) }
-                else if (type == MESSAGE.TX) this.blockchain.memoryPool.addOrUpdate(value);
-                else if (type == MESSAGE.WIPE) blockchain.memoryPool.wipe();
+                if (type === MESSAGE.BLOCKS) { this.blockchain.replace(value); }
+                else if (type === MESSAGE.TX) this.blockchain.memoryPool.addOrUpdate(value);
+                else if (type === MESSAGE.WIPE) this.blockchain.memoryPool.wipe();
             } catch (error) {
                 console.error(`[ws:Error] error ${error}`);
                 throw Error(error);

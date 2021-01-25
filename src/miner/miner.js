@@ -12,23 +12,24 @@ class Miner {
     mine() {
 
         const {
-            blockchain: {memoryPoll},
-            p2pservices
+            blockchain: {memoryPool},
+            p2pservices,
+            wallet
         } = this;
 
-        if (memoryPoll.transactions.length === 0) throw new Error('There are no unconfirmed transactions.');
+        if (memoryPool.transactions.length === 0) throw new Error('There are no unconfirmed transactions.');
         
         /**
          * 1.- Recuperar transaciones de la memoryPoll
          * 2.- Crear un bloque que consiste en una transacion valida
          * 3.- Sincronizar el nuevo bloque con la red
-         * 4.- Limpiar transaciones de la memorypool
+         * 4.- Limpiar transaciones de la memoryPool
          * 5.- Comunicar del borrado para todos los nodos de la red
          */
-        memoryPoll.transactions.push(Transaction.reward(wallet,blockchainwallet));
-        const block = this.blockchain.addBlock(memoryPoll.transactions);
+        memoryPool.transactions.push(Transaction.reward(wallet,blockchainwallet));
+        const block = this.blockchain.addBlock(memoryPool.transactions);
         this.p2pservices.sync();
-        memoryPoll.wipe();
+        memoryPool.wipe();
         p2pservices.broadcast(MESSAGE.WIPE);
 
         return block;
